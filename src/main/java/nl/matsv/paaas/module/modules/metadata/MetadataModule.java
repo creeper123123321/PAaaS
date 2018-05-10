@@ -57,13 +57,27 @@ public class MetadataModule extends AbstractClassModule {
         entity = findClassFromConstant("entityBaseTick");
         livingEntity = findClassFromConstant("livingEntityBaseTick");
         projectile = findClassFromConstant("ownerName", "inGround");
+        if (projectile == null) {
+            projectile = findClassFromConstant("owner", "inGround", "shake"); // 1.13
+        }
         insentient = findClassFromConstant("Unknown target reason, please report on the issue tracker");
         hanging = findClassFromConstant("Unknown target reason, please report on the issue tracker");
+
+        // todo insentient 1.13
+
+        if (hanging == null) {
+            // 1.13
+            hanging = findClassFromConstant("Facing", "TileX", "-ItemRotation");
+        }
 
         entityTypes = findClassFromConstant("Skipping Entity with id {}", "Item");
         if (entityTypes == null) {
             // 1.9.4 & below
             entityTypes = findClassFromConstant("Skipping Entity with id ");
+        }
+        if (entityTypes == null) {
+            // 1.13
+            entityTypes = findClassFromConstant("Skipping Entity with id {}", "item");
         }
         if (entity == null) {
             // b1.8.1 & below
@@ -119,6 +133,7 @@ public class MetadataModule extends AbstractClassModule {
 
     @Override
     public Optional<JsonElement> compare(VersionDataFile current, VersionDataFile other) {
+        if (current.getMetadataTree() == null) return Optional.empty();
         return Optional.of(gson.toJsonTree(current.getMetadataTree()).getAsJsonObject());
     }
 
